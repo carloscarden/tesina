@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <div id="myDiagramDiv" style="width:1000px; height:650px;border: solid 1px black;"></div>
+
+    <script src="https://unpkg.com/gojs"></script>
+
+    <script>
+
+
+        var $ = go.GraphObject.make;
+
+
+
+        // Diagram: View
+        const myDiagram =
+            new go.Diagram("myDiagramDiv",  // create a Diagram for the HTML Div element
+                { "undoManager.isEnabled": true });  // enable undo & redo
+
+
+        myDiagram.nodeTemplateMap.add("Class",  // the default category
+            $(go.Node, "Auto",
+                $(go.Shape, { fill: "white" }),
+                $(go.Panel, "Table",
+
+                    // HEADER 
+                    { desiredSize: new go.Size(150, 90) },
+                    $(go.TextBlock,
+                        { row: 0, column: 0, columnSpan: 3, alignment: go.Spot.Center },
+                        { font: "bold 12pt sans-serif" },
+                        new go.Binding("text", "key")),
+                    // drawn before row 1:
+                    $(go.RowColumnDefinition,
+                        { row: 1, separatorStrokeWidth: 2, separatorStroke: "black" }),
+
+
+                    // PROPERTIES
+                    $(go.TextBlock,
+                        { row: 1, column: 2 },
+                        new go.Binding("text", "prop1")),
+                )
+            ));
+
+        myDiagram.nodeTemplateMap.add("Property",
+            $(go.Node, "Vertical",
+                $(go.Panel, "Auto",
+                    $(go.Shape, "Circle", { name: "SHAPE", width: 26, height: 26, fill: "white" }),
+                ),
+                $(go.TextBlock, new go.Binding("text", "key")),
+            )
+        );
+
+
+        myDiagram.nodeTemplateMap.add("Level",
+            $(go.Node, "Vertical",
+                $(go.TextBlock, new go.Binding("text", "key")),
+                $(go.Panel, "Auto",
+                    $(go.Shape, "Circle", { name: "SHAPE", width: 20, height: 20, fill: "white" }),
+                    $(go.Shape, "Circle", { width: 16, height: 16, strokeWidth: 0 })
+                )
+            )
+        );
+
+
+        myDiagram.linkTemplate =
+            new go.Link().add(new go.Shape({ strokeWidth: 3, stroke: "#555" }))
+
+        // Diagram.model: MODEL
+        // create the model data that will be represented by Nodes and Links
+        myDiagram.model = new go.GraphLinksModel(nodes, links);
+
+        var nodes = [
+            { key: "ADMINISTER", color: "lightblue", prop1: "Dose", category: "Class" },
+            { key: "outcome", color: "orange", category: "Property" },
+            { key: "disease", color: "orange", category: "Property" },
+            { key: "seriousness", color: "orange", category: "Property" },
+            { key: "date", color: "orange", category: "Property" },
+            { key: "month", color: "orange", category: "Property" },
+            { key: "year", color: "orange", category: "Property" },
+            { key: "hour", color: "orange", category: "Property" },
+            { key: "doctor", color: "orange", category: "Property" },
+            { key: "drug", color: "orange", category: "Property" },
+            { key: "elimMode", color: "orange", category: "Property" },
+            { key: "adminMode", color: "orange", category: "Property" },
+            { key: "physiolEffects", color: "orange", category: "Property" },
+            { key: "family", color: "orange", category: "Property" },
+            { key: "depto", color: "orange", category: "Property" },
+            { key: "hospital", color: "orange", category: "Property" },
+            { key: "city", color: "orange", category: "Level" },
+            { key: "state", color: "orange", category: "Property" },
+            { key: "country", color: "orange", category: "Property" },
+            { key: "patient", color: "orange", category: "Property" },
+        ];
+
+        var links = [
+
+            { from: "ADMINISTER", to: "patient" },
+            { from: "patient", to: "city" },
+            { from: "ADMINISTER", to: "doctor" },
+            { from: "doctor", to: "depto" },
+            { from: "depto", to: "hospital" },
+            { from: "hospital", to: "city" },
+            { from: "city", to: "state" },
+            { from: "state", to: "country" },
+            { from: "ADMINISTER", to: "seriousness" },
+            { from: "ADMINISTER", to: "disease" },
+            { from: "ADMINISTER", to: "drug" },
+            { from: "drug", to: "elimMode" },
+            { from: "drug", to: "physiolEffects" },
+            { from: "physiolEffects", to: "family" },
+            { from: "drug", to: "adminMode" },
+            { from: "ADMINISTER", to: "hour" },
+            { from: "ADMINISTER", to: "outcome" },
+            { from: "ADMINISTER", to: "date" },
+            { from: "date", to: "month" },
+            { from: "month", to: "year" },
+        ];
+
+        // Diagram.model: MODEL
+        // create the model data that will be represented by Nodes and Links
+        myDiagram.model = new go.GraphLinksModel(nodes, links);
+
+    </script>
+</body>
+
+</html>
