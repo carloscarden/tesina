@@ -1,6 +1,6 @@
 
 from nltk.corpus import wordnet
-from termino import Termino
+from models.termino import Termino
 import spacy
 
 nlp = spacy.load("en_core_web_sm")

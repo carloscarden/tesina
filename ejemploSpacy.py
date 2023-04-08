@@ -1,8 +1,6 @@
 import spacy
 
-from mockLel import MockLel
 from nltk.corpus import wordnet
-from termino import Termino
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -32,13 +30,11 @@ def encontrarLosObjetosCategoricosDeSujetos(lelsCategoricos):
                 print(f"{subject[0]} {token.text} {obj[0]}")
     return []
 
-
 lelsDeMedida = []
 lelsDeNiveles = []
 lelDeobjetosYsujetosDelVerbo = []
 
                # REGLA 4
 #Categorical objects and subjects of verbs give origin to dimensions
-
 lelsDeNiveles = encontrarLosObjetosCategoricosDeSujetos(lelsDeMedida)
 

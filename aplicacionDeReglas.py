@@ -1,9 +1,9 @@
 
-from clasesDiagrama.objetoDiagrama import ObjetoDiagrama
-from clasesDiagrama.tipoObjetoDiagrama import TipoObjetoDiagrama
 
-from mockLel import MockLel
-from termino import Termino
+from models.clasesDiagrama.objetoDiagrama import ObjetoDiagrama
+from models.clasesDiagrama.tipoObjetoDiagrama import TipoObjetoDiagrama
+from models.mockLel import MockLel
+
 from reglas import Regla
 
 
