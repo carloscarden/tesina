@@ -7,7 +7,7 @@ nlp = spacy.load("en_core_web_sm")
 
 class Regla:
 
-    def regla1(lels):
+    def recuperarLosVerbos(lels):
           return [objeto for objeto in lels if objeto.termino == Termino.VERBO]
     
     
@@ -68,7 +68,7 @@ class Regla:
 
     
 
-    def dameCategoricosDeSujetos(self, lelSujeto, lelsCategoricosDeVerbo):
+    def dameSujetosDeSujetos(self, lelSujeto, lelsCategoricosDeVerbo):
         text = '''A car has a model. A model belongs to one segment. 
     A segment is comprised by different car models according to their size, use, and capacity.'''
         doc = nlp(text)
@@ -86,7 +86,18 @@ class Regla:
                     obj = [w for w in token.rights if w.dep_ == "prep"]
                     if obj:
                         obj = [w for w in obj[0].rights if w.dep_ == "pobj"]
+                
+                # Maneja las conjunciones
+                conj = [w for w in token.rights if w.dep_ == "cc"]
+                if conj:
+                    conj = [w for w in conj[0].rights if w.dep_ == "conj"]
+                    if conj:
+                        obj.extend(conj)
                 if subject and obj:
-                    print(f"{subject[0]} {token.text} {obj[0]}")
+                    print(f"{subject[0]} {token.text} {[o for o in obj]}")       
+    
+
+    def dameLosNiveles(lelDeobjetosYsujetosDeSujetos, lelsDePropiedades):
+        return ''
     
 
