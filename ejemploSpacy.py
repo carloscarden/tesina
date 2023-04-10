@@ -12,32 +12,43 @@ def fraseCompuesta(token, doc, target_words):
     
 
 def encontrarLosObjetosCategoricosDeSujetos(lelsCategoricos):
-    text = '''Medicine or other substance which has a physiological effect when ingested or otherwise 
-    introduced into the body has its administration mode. The drug has an elimination mode.
-'''
+    text = ''' Medicine or other substance which has a physiological effect when ingested
+      or otherwise introduced into the body according to its administration mode. The drug is also
+characterized by an elimination mode '''
     doc = nlp(text)
 
     # Lista de palabras objetivo
-    target_words = ["has", "according to", "characterized by"]
+    target_words = ["has","according to", "characterized by"]
 
     for token in doc:
+        esCompuesta = fraseCompuesta(token, doc, target_words)
         
         if token.text in target_words or fraseCompuesta(token, doc, target_words):
-            print(token.text)
             # Encuentra el sujeto y el objeto de la relación
             subject = [w for w in token.head.lefts if w.dep_ == "nsubj"]
             obj = [w for w in token.rights if w.dep_ == "dobj" or w.dep_ == "pobj"]
-            
 
-            print(subject)
+            if(esCompuesta):
+                obj = [w for w in doc[token.i + 1].rights  if w.dep_ == "dobj" or w.dep_ == "pobj"]
+            else:
+                obj = [w for w in token.rights if w.dep_ == "dobj" or w.dep_ == "pobj"]
+
+
 
             # Busca el objeto en la lista de sustantivos y adjetivos a la derecha
             if not obj:
-                obj = [w for w in token.rights if w.dep_ == "amod" or w.dep_ == "nsubj"]
+                print('caca')
+                if(esCompuesta):
+                    obj = [w for w in doc[token.i + 1].rights if w.dep_ == "amod" or w.dep_ == "nsubj"]
+                else:
+                    obj = [w for w in token.rights if w.dep_ == "amod" or w.dep_ == "nsubj"]
             
             # Maneja las preposiciones
             if not obj:
-                obj = [w for w in token.rights if w.dep_ == "prep"]
+                if(esCompuesta):
+                    obj = [w for w in doc[token.i + 1].rights if w.dep_ == "prep"]
+                else:
+                    obj = [w for w in token.rights if w.dep_ == "prep"]
                 if obj:
                     obj = [w for w in obj[0].rights if w.dep_ == "pobj"]
             if obj:
@@ -61,9 +72,3 @@ lelDeobjetosYsujetosDelVerbo = []
                # REGLA 4
 #Categorical objects and subjects of verbs give origin to dimensions
 lelsDeNiveles = encontrarLosObjetosCategoricosDeSujetos(lelsDeMedida)
-
-   
-                         
-
-
-
