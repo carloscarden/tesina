@@ -7,15 +7,6 @@ from reglas import Regla
 
 
 
-def cargarLosNivelesAlDiagrama(sujeto, lelsDeNiveles):
-    return ''
-
-def cargarLasPropiedadesAlDiagrama(sujeto, lelsDePropiedades, objetosDelDiagrama):
-    for lel in lelsDePropiedades:
-        print(lel)
-
-    return ''
-
 reglas = Regla()
 m = MockLel()
 lelMockeado = m.lelMockeado()
@@ -74,7 +65,7 @@ for sujeto in lelsCategoricosDeVerbo:
                   # REGLA 4
     # Categorical objects and subjects of objects or subjects give origin to levels
     lelsDeNivel = reglas.dameLosNiveles(lelDeobjetosYsujetosDeSujetos, lelsDePropiedades)
-    cargarLosNivelesAlDiagrama(sujeto, lelsDeNivel )
+    diagrama.cargarLosNiveles(sujeto, lelsDeNivel )
 
 
 

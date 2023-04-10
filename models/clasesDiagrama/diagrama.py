@@ -24,3 +24,5 @@ class Diagrama:
             nuevoLink = LinkDiagrama(desdeExpresion, lel.expresion)
             self.linksDelDiagrama.append(nuevoLink)
         
+    def cargarLosNiveles(self, sujeto, lelsDeNivel ):
+        return ''    

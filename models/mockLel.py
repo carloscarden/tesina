@@ -1,5 +1,5 @@
-from Lel import Lel
-from termino import Termino
+from models.Lel import Lel
+from models.termino import Termino
 
 
 class MockLel:

@@ -7,7 +7,7 @@ nlp = spacy.load("en_core_web_sm")
 
 class Regla:
 
-    def recuperarLosVerbos(lels):
+    def recuperarLosVerbos(self, lels):
           return [objeto for objeto in lels if objeto.termino == Termino.VERBO]
     
     
@@ -15,12 +15,7 @@ class Regla:
         notionVerboDoc = nlp(nocion)
         # procesar notion para que me de los objetos y sujetos
         lista_expresiones = self.procesarNotion(notionVerboDoc)
-        objetosYsujetos = []
-        for expresion in lista_expresiones:
-            for obj_lel in arreglo_objetos_lel:
-                if obj_lel.expresion.lower()== expresion.lower() and obj_lel.termino != Termino.VERBO:
-                    objetosYsujetos.append(obj_lel)
-        return objetosYsujetos
+        return  self.encontrarLels(lista_expresiones,  arreglo_objetos_lel)
 
 
     def procesarNotion(self, doc):
@@ -32,6 +27,20 @@ class Regla:
             if token.pos_ == "NOUN" :
                 objetos_y_sujetos.append(token.text)
         return objetos_y_sujetos
+
+
+    def encontrarLels(self, lista_expresiones, arreglo_objetos_lel):
+        print('me llegan', lista_expresiones)
+        objetosYsujetos = []
+        for expresion in lista_expresiones:
+
+            for obj_lel in arreglo_objetos_lel:
+                if obj_lel.expresion.lower()== expresion.lower() and obj_lel.termino != Termino.VERBO:
+                    objetosYsujetos.append(obj_lel)
+        print(objetosYsujetos)           
+        return objetosYsujetos
+
+
     
     def encontrarLosObjetosNumericos(self, lelDeobjetosYsujetosDelVerbo):
         lelsDeMedida = []
@@ -42,7 +51,7 @@ class Regla:
                 lelsDeMedida.append(lel)
         return lelsDeMedida
     
-    def es_medida(palabra):
+    def es_medida(self, palabra):
         sinonimos = set()
         '''
     En Spacy, lemma_ es un atributo de los tokens que devuelve la forma base o lema de la palabra. 
@@ -54,26 +63,33 @@ class Regla:
     Esto es útil para llevar a cabo análisis de texto, ya que a menudo queremos agrupar diferentes 
     formas de la misma palabra en una sola categoría o término.
     '''
-        for syn in wordnet.synsets(palabra, lang='spa'):
-            for lemma in syn.lemmas(lang='spa'):
+        for syn in wordnet.synsets(palabra, lang='eng'):
+            for lemma in syn.lemmas(lang='eng'):
                 sinonimos.add(lemma.name())
-                sinonimos.add(palabra)
-                medidas = {'cantidad', 'tamaño', 'capacidad', 
-               'volumen', 'longitud', 'anchura',  
-               'amplitud', 'densidad', 'extensión'}
+        sinonimos.add(palabra)
+        medidas = {'amount', 'size', 'capacity',
+                  'volume', 'length', 'width',
+                  'amplitude', 'density', 'extension'}
         return any(medida in sinonimos for medida in medidas)
 
     def dameCategoricosDeVerbos(self, lelDeobjetosYsujetosDelVerbo, lelsDeMedida):
-        return []
+        return [lel for lel in  lelDeobjetosYsujetosDelVerbo if lel.expresion not in 
+                [lelMedida.expresion for lelMedida in lelsDeMedida]]
 
     
 
     def dameSujetosDeSujetos(self, lelSujeto, lelsCategoricosDeVerbo):
-        text = '''A car has a model. A model belongs to one segment. 
-    A segment is comprised by different car models according to their size, use, and capacity.'''
-        doc = nlp(text)
+        sujetosDeSujetos = self.procesarSujetosDeSujetos(lelSujeto.nocion)
+        print('la concha de tu madre' ,[token.text for token in sujetosDeSujetos])
+        return self.encontrarLels([token.text for token in sujetosDeSujetos], lelsCategoricosDeVerbo)
+
+
+    def procesarSujetosDeSujetos(self, nocion):
+        doc = nlp(nocion)
         # Lista de palabras objetivo
-        target_words = ["has", "belongs", "comprised", "covered", "incorporated", "involves"]
+        target_words = ["has", "belongs", "comprised", "covered", "incorporated", "involves", "according"]
+
+        sujetosDeSujeto= []
 
         for token in doc:
             if token.text in target_words:
@@ -93,8 +109,13 @@ class Regla:
                     conj = [w for w in conj[0].rights if w.dep_ == "conj"]
                     if conj:
                         obj.extend(conj)
-                if subject and obj:
-                    print(f"{subject[0]} {token.text} {[o for o in obj]}")       
+                if(obj):
+                    print([o.text for o in obj])
+                    for o in obj:
+                        sujetosDeSujeto.append(o)
+        print(sujetosDeSujeto)        
+        return sujetosDeSujeto
+
     
 
     def dameLosNiveles(lelDeobjetosYsujetosDeSujetos, lelsDePropiedades):
