@@ -1,5 +1,7 @@
 
+from typing import List
 from models.clasesDiagrama.linkDiagrama import LinkDiagrama
+from models.clasesDiagrama.objetoDiagrama import ObjetoDiagrama
 
 
 class Diagrama:
@@ -8,15 +10,13 @@ class Diagrama:
     """
     i = 12345
 
-    def __init__(self, objetosDelDiagrama, linksDelDiagrama):
+    def __init__(self, objetosDelDiagrama: List[ObjetoDiagrama], linksDelDiagrama: List[LinkDiagrama]):
         self.objetosDelDiagrama= objetosDelDiagrama
         self.linksDelDiagrama= linksDelDiagrama
 
     def nuevoObjetoDelDiagrama(self, objetoDelDiagrama):
         self.objetosDelDiagrama.append(objetoDelDiagrama)
 
-    def cargarLasPropiedades(self, sujeto, lelsDePropiedades):
-        return ''
 
 
     def generarLinks(self,desdeExpresion, lelsCategoricos):

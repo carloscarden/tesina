@@ -83,7 +83,8 @@ class Regla:
         doc = nlp(lelsCategoricos.nocion)
 
         # Lista de palabras objetivo
-        target_words = ["has","according to", "characterized by","manufactured"]
+        target_words = ["has", "belongs", "comprised", "covered", "incorporated", "involves", 
+                    "according","according to", "characterized by","manufactured"]
 
         encontradoEnSujeto = EncontradoEnSujeto([],[], [])
 
@@ -153,9 +154,9 @@ class Regla:
 
     def procesarElSujeto(self, encontradoEnSujeto: EncontradoEnSujeto, lelMockeado) -> ProcesadoEnSujeto:
 
-        procesadoEnSujeto = ProcesadoEnSujeto([],[],[])
+        procesadoEnSujeto = ProcesadoEnSujeto([],[])
         self.procesarLosObjectsSimples(procesadoEnSujeto, encontradoEnSujeto.objectsSimple, lelMockeado)
-        self.procesarLosPalabraDoble(procesadoEnSujeto, encontradoEnSujeto, lelMockeado)
+        self.procesarLosPalabraDoble(procesadoEnSujeto, encontradoEnSujeto.nounChunks, lelMockeado)
 
         return procesadoEnSujeto
 
@@ -169,25 +170,39 @@ class Regla:
 
             lelDeSujetoAprocesar = list( filter( lambda lel: self.esLelBuscado(lel, aBuscar) , 
                                            lelMockeado))
-            if lelDeSujetoAprocesar :
-                doc = nlp(lelDeSujetoAprocesar[0].nocion)
-                medidas = [tok.text for tok in doc if self.es_medida(tok.text)]
-                if(len(medidas)>0):
-                         #Rule 5. 
-                    # Numerical objects and subjects of objects or subjects give origin to properties.
-                    # buscar entre los objetos y sujetos del notion un objeto numerico
-                    procesadoEnSujeto.nuevoLelDePropiedad(lelDeSujetoAprocesar[0])
-                else:
-                         # REGLA 4
-                    # Categorical objects and subjects of objects or subjects give origin to levels
-                    # Si no cae en la categoria de medida, entonces es un categorico del verbo
-                    procesadoEnSujeto.nuevoLelDeNivel(lelDeSujetoAprocesar[0])
+            self.tipoDeLelQueEsElSujeto(lelDeSujetoAprocesar, procesadoEnSujeto)                               
 
     
-    def esLelBuscado(unLel: Lel, expresionAbuscar: str):
+    def esLelBuscado(self, unLel: Lel, expresionAbuscar: str):
         return  unLel.expresion.lower()==  expresionAbuscar and unLel.termino != Termino.VERBO
 
+
+    def tipoDeLelQueEsElSujeto(self, lelDeSujetoAprocesar:List[Lel], procesadoEnSujeto: ProcesadoEnSujeto):
+        if lelDeSujetoAprocesar :
+            doc = nlp(lelDeSujetoAprocesar[0].nocion)
+            medidas = [tok.text for tok in doc if self.es_medida(tok.text)]
+            if(len(medidas)>0):
+                     #Rule 5. 
+                # Numerical objects and subjects of objects or subjects give origin to properties.
+                # buscar entre los objetos y sujetos del notion un objeto numerico
+                procesadoEnSujeto.nuevoLelDePropiedad(lelDeSujetoAprocesar[0])
+            else:
+                    # REGLA 4
+                # Categorical objects and subjects of objects or subjects give origin to levels
+                # Si no cae en la categoria de medida, entonces es un categorico del verbo
+                procesadoEnSujeto.nuevoLelDeNivel(lelDeSujetoAprocesar[0])
+
     
-    def procesarLosPalabraDoble(self, procesadoEnSujeto, encontradoEnSujeto):
-        return ''
+    def procesarLosPalabraDoble(self, procesadoEnSujeto, nounChunks, lelMockeado):
+        for nc in nounChunks:
+            lelDeSujetoAprocesar = list( filter( lambda lel: self.esLelBuscadoCompuesto(lel, nc) , 
+                                           lelMockeado))
+            self.tipoDeLelQueEsElSujeto(lelDeSujetoAprocesar, procesadoEnSujeto)                               
+
+
+    def esLelBuscadoCompuesto(self, unLel: Lel, expresionAbuscar):
+        completo = " ".join([ n.text for n in expresionAbuscar]).strip()
+        ultimo  = expresionAbuscar[-1].text.strip()
+        return ( unLel.expresion.lower().strip() ==  completo.lower() and unLel.termino != Termino.VERBO ) or \
+               ( unLel.expresion.lower().strip() ==  ultimo.lower() and unLel.termino != Termino.VERBO )
     

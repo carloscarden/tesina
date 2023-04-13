@@ -2,7 +2,6 @@ from models.clasesDiagrama.diagrama import Diagrama
 from models.clasesDiagrama.objetoDiagrama import ObjetoDiagrama
 from models.clasesDiagrama.tipoObjetoDiagrama import TipoObjetoDiagrama
 from models.mockLel import MockLel
-from models.termino import Termino
 import spacy
 from reglas import Regla
 
@@ -33,20 +32,36 @@ for v in verbos:
     diagrama.nuevoObjetoDelDiagrama(verboEnDiagrama)
     diagrama.generarLinks(v.expresion, procesadoEnVerbo.lelsCategoricosDeVerbo)                         
 
+lelsAprocesar = procesadoEnVerbo.lelsCategoricosDeVerbo
+
+while 1:
+    hayMasLels = []
+
+    for sujeto in  lelsAprocesar:
+
+        diagrama.nuevoObjetoDelDiagrama(ObjetoDiagrama(sujeto.expresion, '', TipoObjetoDiagrama.DIMENSION))
+
+        encontradoEnSujeto  = reglas.encontrarLosObjetosCategoricosDeSujetos(sujeto)
+        procesadoEnSujeto = reglas.procesarElSujeto(encontradoEnSujeto, lelMockeado)
 
 
-
-for sujeto in  procesadoEnVerbo.lelsCategoricosDeVerbo:
-
-    diagrama.nuevoObjetoDelDiagrama(ObjetoDiagrama(sujeto.expresion, '', TipoObjetoDiagrama.DIMENSION))
+        diagrama.generarLinks(sujeto.expresion, procesadoEnSujeto.lelsDeNivel )
 
 
-    encontradoEnSujeto  = reglas.encontrarLosObjetosCategoricosDeSujetos(sujeto)
-    procesadoEnSujeto = reglas.procesarElSujeto(encontradoEnSujeto, lelMockeado)
+    if not hayMasLels:
+        break
+    else:
+        lelsAprocesar = hayMasLels
 
+print("DIAGRAMAS")
+for o in diagrama.objetosDelDiagrama:
+    print(o.key)
+print("**********************************")
+print("LINKS")
+for l in diagrama.linksDelDiagrama:
+    print(l.desde+ " to "+l.hasta)
+print("**********************************")
 
-    diagrama.cargarLasPropiedades(sujeto, procesadoEnSujeto.lelsDePropiedad)
-    diagrama.cargarLosNiveles(sujeto, procesadoEnSujeto.lelsDeNivel )
 
 
 
