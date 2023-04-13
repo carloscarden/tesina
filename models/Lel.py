@@ -3,7 +3,7 @@ class Lel:
     para almacenar información lingüística adicional sobre las palabras en un idioma en particular"""
     i = 12345
 
-    def __init__(self, termino, expresion, nocion):
+    def __init__(self, termino: str, expresion: str, nocion: str):
         self.termino = termino
         self.expresion = expresion
         self.nocion = nocion

@@ -24,8 +24,8 @@ is to treat patients. The doctor works for a hospital and belongs to a Departmen
         lel9 = Lel(Termino.OBJETO, 'Date', ''' A particular day of a month, in a particular year.
 ''')
         lel10 = Lel(Termino.OBJETO, 'Seriousness', '''Degree of risk of the life of a patient.''')
-        lel11 = Lel(Termino.OBJETO, 'Administration', ''''The way of giving a drug to somebody.''')
-        lel12 = Lel(Termino.OBJETO, 'Elimination', '''The process of removing or getting rid of the
+        lel11 = Lel(Termino.OBJETO, 'Administration mode', ''''The way of giving a drug to somebody.''')
+        lel12 = Lel(Termino.OBJETO, 'Elimination mode', '''The process of removing or getting rid of the
 drug completely''')
         lel13 = Lel(Termino.OBJETO, 'Physiological effect', '''The expected result of administering a drug,
 it belongs to one family.''')

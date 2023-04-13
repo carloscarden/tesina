@@ -2,70 +2,53 @@ from models.clasesDiagrama.diagrama import Diagrama
 from models.clasesDiagrama.objetoDiagrama import ObjetoDiagrama
 from models.clasesDiagrama.tipoObjetoDiagrama import TipoObjetoDiagrama
 from models.mockLel import MockLel
-
+from models.termino import Termino
+import spacy
 from reglas import Regla
 
 
-
+nlp = spacy.load("en_core_web_sm")
 reglas = Regla()
 m = MockLel()
 lelMockeado = m.lelMockeado()
 
 diagrama = Diagrama([], [])
 
-lelsDeMedida = []
-lelsCategoricosDeVerbo = []
-lelDeobjetosYsujetosDeSujetos  = []
-lelsDeNivel = []
 
+
+        # REGLA 1
+# Verbs give origin to facts. 
 verbos = reglas.recuperarLosVerbos(lelMockeado)
 
 for v in verbos:
 
-                    # REGLA 1
-    # Verbs give origin to facts. 
     verboEnDiagrama = ObjetoDiagrama(v.expresion, '',  TipoObjetoDiagrama.HECHO)
 
-    lelDeobjetosYsujetosDelVerbo = reglas.encontrarObjetosYsujetos(v.nocion, lelMockeado)
+    sujetosYObjetosDeVerbo = reglas.encontrarObjetosYsujetosDeVerbo(v.nocion)
+    procesadoEnVerbo = reglas.procesarElVerbo(sujetosYObjetosDeVerbo, lelMockeado)
 
-                    # REGLA 2
-    # Numerical objects and subjects of verbs give origin to measures.
-    # buscar entre los objetos y sujetos del notion un objeto numerico
-    lelsDeMedida = reglas.encontrarLosObjetosNumericos(lelDeobjetosYsujetosDelVerbo)
 
-    if(lelsDeMedida):
-        verboEnDiagrama.prop1 = lelsDeMedida[0].expresion
+    verboEnDiagrama.prop1 = procesadoEnVerbo.devolverLelsDeMedida()
     
     diagrama.nuevoObjetoDelDiagrama(verboEnDiagrama)
-
-                    # REGLA 3
-    # Categorical objects and subjects of verbs give origin to dimensions
-    # Sacar de todos los objetos y sujetos los objetos numericos
-    lelsCategoricosDeVerbo = reglas.\
-                              dameCategoricosDeVerbos(lelDeobjetosYsujetosDelVerbo, lelsDeMedida)
-
-    diagrama.generarLinks(v.expresion, lelsCategoricosDeVerbo)                         
+    diagrama.generarLinks(v.expresion, procesadoEnVerbo.lelsCategoricosDeVerbo)                         
 
 
 
 
+for sujeto in  procesadoEnVerbo.lelsCategoricosDeVerbo:
 
-for sujeto in lelsCategoricosDeVerbo:
-    nuevaDimension = ObjetoDiagrama(sujeto.expresion, '', TipoObjetoDiagrama.DIMENSION)
-    diagrama.nuevoObjetoDelDiagrama(nuevaDimension)
-
-    lelDeobjetosYsujetosDeSujetos  = reglas.dameSujetosDeSujetos(sujeto, lelsCategoricosDeVerbo)
-
-                   #Rule 5. 
-    # Numerical objects and subjects of objects or subjects give origin to properties.
-    lelsDePropiedades = reglas.encontrarLosObjetosNumericos(lelDeobjetosYsujetosDeSujetos)
-    diagrama.cargarLasPropiedades(sujeto, lelsDePropiedades)
+    diagrama.nuevoObjetoDelDiagrama(ObjetoDiagrama(sujeto.expresion, '', TipoObjetoDiagrama.DIMENSION))
 
 
-                  # REGLA 4
-    # Categorical objects and subjects of objects or subjects give origin to levels
-    lelsDeNivel = reglas.dameLosNiveles(lelDeobjetosYsujetosDeSujetos, lelsDePropiedades)
-    diagrama.cargarLosNiveles(sujeto, lelsDeNivel )
+    encontradoEnSujeto  = reglas.encontrarLosObjetosCategoricosDeSujetos(sujeto)
+    procesadoEnSujeto = reglas.procesarElSujeto(encontradoEnSujeto, lelMockeado)
+
+
+    diagrama.cargarLasPropiedades(sujeto, procesadoEnSujeto.lelsDePropiedad)
+    diagrama.cargarLosNiveles(sujeto, procesadoEnSujeto.lelsDeNivel )
+
+
 
 
 
