@@ -13,8 +13,6 @@ lelMockeado = m.lelMockeado()
 
 diagrama = Diagrama([], [])
 
-
-
         # REGLA 1
 # Verbs give origin to facts. 
 verbos = reglas.recuperarLosVerbos(lelMockeado)
@@ -34,6 +32,12 @@ for v in verbos:
 
 lelsAprocesar = procesadoEnVerbo.lelsCategoricosDeVerbo
 
+
+# True/False are not keywords, they are just built in global constants 
+# (that are reassignable like any other variable), 
+# so the interpreter has to check what they point to
+
+# 0 and 1 are faster than False and True
 while 1:
     hayMasLels = []
 

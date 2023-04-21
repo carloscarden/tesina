@@ -1,4 +1,3 @@
-
 from typing import List
 from models.clasesDiagrama.linkDiagrama import LinkDiagrama
 from models.clasesDiagrama.objetoDiagrama import ObjetoDiagrama
@@ -16,8 +15,6 @@ class Diagrama:
 
     def nuevoObjetoDelDiagrama(self, objetoDelDiagrama):
         self.objetosDelDiagrama.append(objetoDelDiagrama)
-
-
 
     def generarLinks(self,desdeExpresion, lelsCategoricos):
         for lel in lelsCategoricos:
