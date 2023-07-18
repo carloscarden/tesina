@@ -43,7 +43,8 @@ while 1:
 
     for sujeto in  lelsAprocesar:
 
-        diagrama.nuevoObjetoDelDiagrama(ObjetoDiagrama(sujeto.expresion, '', TipoObjetoDiagrama.DIMENSION))
+        diagrama.nuevoObjetoDelDiagrama(
+            ObjetoDiagrama(sujeto.expresion, '', TipoObjetoDiagrama.DIMENSION))
 
         encontradoEnSujeto  = reglas.encontrarLosObjetosCategoricosDeSujetos(sujeto)
         procesadoEnSujeto = reglas.procesarElSujeto(encontradoEnSujeto, lelMockeado)

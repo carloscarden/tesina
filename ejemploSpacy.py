@@ -1,30 +1,27 @@
 import spacy
-from numpy import asarray
-
-from models.Lel import Lel
-from models.mockLel import MockLel
-
-from models.termino import Termino
 from reglas import Regla
 
-nlp = spacy.load('en_core_web_md')
+# Cargar modelo de lenguaje en inglés de Spacy
+nlp = spacy.load("en_core_web_md")
 
-# Obtener los vectores de las palabras "day" y "hour"
-day_vector = nlp("day").vector
-hour_vector = nlp("hour").vector
+doc = nlp("date: A particular day of a month, in a particular year.")
 
-# Calcular la similitud semántica entre "day" y otras palabras
-similar_words = []
-print(len(nlp.vocab))
-for word in nlp.vocab:
-    if word.has_vector and word.is_lower and word.is_alpha:
-        similarity_day = nlp("day").similarity(word)
-        similarity_hour = nlp("hour").similarity(word)
-        if similarity_day > 0.6 and similarity_hour > 0.6:
-            similar_words.append(word.text)
+reglas = Regla()
+sujetosYObjetosDeVerbo = reglas.encontrarObjetosYsujetosDeVerbo("date: A particular day of a month, in a particular year.")
+print(sujetosYObjetosDeVerbo)
+date_token = doc[0] # el primer token de la oración
+print("****************")
+print(date_token)
+candidates = [token for token in doc if token != date_token]
 
-# Imprimir las palabras similares encontradas
-print(similar_words)
+similarities = [(candidate.text, date_token.similarity(candidate)) for candidate in candidates]
+
+similarities_sorted = sorted(similarities, key=lambda x: x[1], reverse=True)
+
+for candidate, score in similarities_sorted:
+    print(candidate, score)
+
+
 
 
 
