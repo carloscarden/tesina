@@ -9,9 +9,30 @@
 </head>
 
 <body>
+    <div id="sample">
+        <div style="width: 100%; display: flex; justify-content: space-between">
+            <div id="myPaletteDiv"
+                style="width: 105px; margin-right: 2px; background-color: whitesmoke; border: 1px solid black; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;">
+                <canvas tabindex="0" width="103" height="618"
+                    style="position: absolute; top: 0px; left: 0px; z-index: 2; user-select: none; touch-action: none; width: 103px; height: 618px; cursor: auto;"></canvas>
+                <div style="position: absolute; overflow: auto; width: 103px; height: 618px; z-index: 1;">
+                    <div style="position: absolute; width: 1px; height: 1px;"></div>
+                </div>
+            </div>
+            <div id="myDiagramDiv"
+                style="flex-grow: 1; height: 620px; border: 1px solid black; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;">
+                <canvas tabindex="0" width="1011" height="618"
+                    style="position: absolute; top: 0px; left: 0px; z-index: 2; user-select: none; touch-action: none; width: 1011px; height: 618px; cursor: auto;"></canvas>
+                <div style="position: absolute; overflow: auto; width: 1011px; height: 618px; z-index: 1;">
+                    <div style="position: absolute; width: 1px; height: 1px;"></div>
+                </div>
+            </div>
+        </div>
 
-    <div id="myDiagramDiv" style="width:1000px; height:650px;border: solid 1px black;"></div>
-
+        <div>
+        </div>
+    </div>
+    <button id="blobButton">Make Blob and Download</button>
     <script src="https://unpkg.com/gojs"></script>
 
     <script>
@@ -79,9 +100,9 @@
         myDiagram.model = new go.GraphLinksModel(nodes, links);
 
         var nodes = [
-            { key: "ADMINISTER", color: "lightblue", prop1: "Doseaaa",  category: "Class" },
-            { key: "outcome", color: "orange",  prop1: "Doseaaa",category: "Property" },
-            { key: "disease", color: "orange",  prop1: "Doseaaa",category: "Property" },
+            { key: "ADMINISTER", color: "lightblue", prop1: "Doseaaa", category: "Class" },
+            { key: "outcome", color: "orange", prop1: "Doseaaa", category: "Property" },
+            { key: "disease", color: "orange", prop1: "Doseaaa", category: "Property" },
             { key: "seriousness", color: "orange", category: "Property" },
             { key: "date", color: "orange", category: "Property" },
             { key: "month", color: "orange", category: "Property" },
@@ -126,10 +147,83 @@
             { from: "month", to: "year" },
         ];
 
+        // initialize the Palette that is on the left side of the page
+        myPalette =
+            new go.Palette("myPaletteDiv",  // must name or refer to the DIV HTML element
+                {
+                    maxSelectionCount: 1,
+                    nodeTemplateMap: myDiagram.nodeTemplateMap,  // share the templates used by myDiagram
+                    linkTemplate: // simplify the link template, just in this Palette
+                        $(go.Link,
+                            { // because the GridLayout.alignment is Location and the nodes have locationSpot == Spot.Center,
+                                // to line up the Link in the same manner we have to pretend the Link has the same location spot
+                                locationSpot: go.Spot.Center,
+                                selectionAdornmentTemplate:
+                                    $(go.Adornment, "Link",
+                                        { locationSpot: go.Spot.Center },
+                                        $(go.Shape,
+                                            { isPanelMain: true, fill: null, stroke: "deepskyblue", strokeWidth: 0 }),
+                                        $(go.Shape,  // the arrowhead
+                                            { toArrow: "Standard", stroke: null })
+                                    )
+                            },
+                            {
+                                routing: go.Link.AvoidsNodes,
+                                curve: go.Link.JumpOver,
+                                corner: 5,
+                                toShortLength: 4
+                            },
+                            new go.Binding("points"),
+                            $(go.Shape,  // the link path shape
+                                { isPanelMain: true, strokeWidth: 2 }),
+                            $(go.Shape,  // the arrowhead
+                                { toArrow: "Standard", stroke: null })
+                        ),
+                    model: new go.GraphLinksModel([  // specify the contents of the Palette
+                        { text: "Start", figure: "Ellipse", "size": "75 75", fill: "#00AD5F" },
+                        { text: "Step" },
+                        { text: "DB", figure: "Database", fill: "lightgray" },
+                        { text: "???", figure: "Diamond", fill: "lightskyblue" },
+                        { text: "End", figure: "Ellipse", "size": "75 75", fill: "#CE0620" },
+                        { text: "Comment", figure: "RoundedRectangle", fill: "lightyellow" }
+                    ], [
+                        // the Palette also has a disconnected Link, which the user can drag-and-drop
+                        { points: new go.List(/*go.Point*/).addAll([new go.Point(0, 0), new go.Point(30, 0), new go.Point(30, 40), new go.Point(60, 40)]) }
+                    ])
+                });
         // Diagram.model: MODEL
         // create the model data that will be represented by Nodes and Links
         myDiagram.model = new go.GraphLinksModel(nodes, links);
+        document.getElementById("blobButton").addEventListener("click", makeBlob);
 
+        // When the blob is complete, make an anchor tag for it and use the tag to initiate a download
+        // Works in Chrome, Firefox, Safari, Edge, IE11
+        function myCallback(blob) {
+            var url = window.URL.createObjectURL(blob);
+            var filename = "myBlobFile.png";
+
+            var a = document.createElement("a");
+            a.style = "display: none";
+            a.href = url;
+            a.download = filename;
+
+            // IE 11
+            if (window.navigator.msSaveBlob !== undefined) {
+                window.navigator.msSaveBlob(blob, filename);
+                return;
+            }
+
+            document.body.appendChild(a);
+            requestAnimationFrame(() => {
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            });
+        }
+
+        function makeBlob() {
+            var blob = myDiagram.makeImageData({ background: "white", returnType: "blob", callback: myCallback });
+        }
     </script>
 </body>
 

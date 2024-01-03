@@ -1,30 +1,42 @@
 
+import spacy
+
+
+from spacy.language import Language
+from spacy.tokens import Token
+from spacy.tokens import Doc
+from spacy.tokens import Span
+
 from nltk.corpus import wordnet
+
+
 from models.Lel import Lel
 from models.encontradoEnSujeto import EncontradoEnSujeto
 from models.procesadoEnSujeto import ProcesadoEnSujeto
 from models.procesadoEnVerbo import ProcesadoEnVerbo
-from models.termino import Termino
+from models.Categoria import Categoria
+
 from typing import List
 
-import spacy
+
 
 nlp = spacy.load("en_core_web_sm")
+
 
 class Regla:
 
     def recuperarLosVerbos(self, lels: List[Lel]):
-          return [objeto for objeto in lels if objeto.termino == Termino.VERBO]
+          return [objeto for objeto in lels if objeto.categoria == Categoria.VERBO]
     
     
-    def encontrarObjetosYsujetosDeVerbo(self, nocion):
+    def encontrarObjetosYsujetosDeVerbo(self, nocion: str):
         notionVerboDoc = nlp(nocion)
         # procesar notion para que me de los objetos y sujetos
-        lista_expresiones = self.procesarNotion(notionVerboDoc)
-        return lista_expresiones
+        lista_simboloes = self.procesarNotion(notionVerboDoc)
+        return lista_simboloes
 
 
-    def procesarNotion(self, doc):
+    def procesarNotion(self, doc: Doc) -> List[str]:
         # Lista para almacenar los objetos encontrados
         objetos_y_sujetos = []
         # Recorrer los tokens y verificar si son objetos 
@@ -34,10 +46,11 @@ class Regla:
                 objetos_y_sujetos.append(token.text)
         return objetos_y_sujetos
 
-    def procesarElVerbo(self, sujetosYObjetosDeVerbo, lelMockeado)-> ProcesadoEnVerbo:
+    def procesarElVerbo(self, sujetosYObjetosDeVerbo: List[str], lelMockeado: List[Lel])-> ProcesadoEnVerbo:
         procesadoEnVerbo = ProcesadoEnVerbo([],[])
-        for expresion in sujetosYObjetosDeVerbo :
-            lelDeVerboAprocesar = list( filter( lambda obj_lel: self.esLelBuscado(obj_lel, expresion) , 
+        for simbolo in sujetosYObjetosDeVerbo :
+            # Encontrar el LEL correspondiente
+            lelDeVerboAprocesar = list( filter( lambda obj_lel: self.esLelBuscado(obj_lel, simbolo) , 
                                            lelMockeado))
             if lelDeVerboAprocesar:
                 doc = nlp(lelDeVerboAprocesar[0].nocion)
@@ -125,13 +138,13 @@ class Regla:
         return encontradoEnSujeto
 
 
-    def fraseCompuesta(self, token, doc, target_words):
+    def fraseCompuesta(self, token: Token, doc: Doc, target_words: List[str]) -> bool:
         if token.i < len(doc) - 1:
             target_phrase = token.text + " " + doc[token.i + 1].text
             return target_phrase in target_words
         return False
 
-    def procesarNounChunk(self, encontradoEnSujeto: EncontradoEnSujeto, noun_chunk):
+    def procesarNounChunk(self, encontradoEnSujeto: EncontradoEnSujeto, noun_chunk: Span ):
         # Crear lista de palabras a eliminar
         stop_words = ["its", "an", "a"]
 
@@ -144,12 +157,6 @@ class Regla:
             encontradoEnSujeto.nuevoNounChunk(sinPreposiciones)
         else:
             encontradoEnSujeto.nuevoObjetoSimple(sinPreposiciones[0])
-
-    def fraseCompuesta(self, token, doc, target_words):
-        if token.i < len(doc) - 1:
-            target_phrase = token.text + " " + doc[token.i + 1].text
-            return target_phrase in target_words
-        return False
 
 
     def procesarElSujeto(self, encontradoEnSujeto: EncontradoEnSujeto, lelMockeado) -> ProcesadoEnSujeto:
@@ -165,16 +172,16 @@ class Regla:
     def procesarLosObjectsSimples(self, procesadoEnSujeto: ProcesadoEnSujeto, 
                                    objectsSimple, lelMockeado):
         
-        for expresion in objectsSimple:
-            aBuscar = expresion.text.lower()
+        for simbolo in objectsSimple:
+            aBuscar = simbolo.text.lower()
 
             lelDeSujetoAprocesar = list( filter( lambda lel: self.esLelBuscado(lel, aBuscar) , 
                                            lelMockeado))
             self.tipoDeLelQueEsElSujeto(lelDeSujetoAprocesar, procesadoEnSujeto)                               
 
     
-    def esLelBuscado(self, unLel: Lel, expresionAbuscar: str):
-        return  unLel.expresion.lower()==  expresionAbuscar and unLel.termino != Termino.VERBO
+    def esLelBuscado(self, unLel: Lel, simboloAbuscar: str):
+        return  unLel.simbolo.lower()==  simboloAbuscar and unLel.categoria != Categoria.VERBO
 
 
     def tipoDeLelQueEsElSujeto(self, lelDeSujetoAprocesar:List[Lel], procesadoEnSujeto: ProcesadoEnSujeto):
@@ -200,9 +207,9 @@ class Regla:
             self.tipoDeLelQueEsElSujeto(lelDeSujetoAprocesar, procesadoEnSujeto)                               
 
 
-    def esLelBuscadoCompuesto(self, unLel: Lel, expresionAbuscar):
-        completo = " ".join([ n.text for n in expresionAbuscar]).strip()
-        ultimo  = expresionAbuscar[-1].text.strip()
-        return ( unLel.expresion.lower().strip() ==  completo.lower() and unLel.termino != Termino.VERBO ) or \
-               ( unLel.expresion.lower().strip() ==  ultimo.lower() and unLel.termino != Termino.VERBO )
+    def esLelBuscadoCompuesto(self, unLel: Lel, simboloAbuscar):
+        completo = " ".join([ n.text for n in simboloAbuscar]).strip()
+        ultimo  = simboloAbuscar[-1].text.strip()
+        return ( unLel.simbolo.lower().strip() ==  completo.lower() and unLel.categoria != Categoria.VERBO ) or \
+               ( unLel.simbolo.lower().strip() ==  ultimo.lower() and unLel.categoria != Categoria.VERBO )
     

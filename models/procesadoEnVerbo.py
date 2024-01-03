@@ -8,7 +8,18 @@ class ProcesadoEnVerbo:
     i = 12345
 
     def __init__(self, lelsDeMedida: List[Lel], lelsCategoricosDeVerbo: List[Lel]):
+        ''' 
+          lelsDeMedida be the set of objects and subjects in notion of verb that denote 
+                numerical attributes
+        '''
+
         self.lelsDeMedida=lelsDeMedida 
+
+
+        ''' 
+          lelsCategoricosDeVerbo be the set of objects and subjects in notion of verb that denote
+                categorical attributes
+        '''
         self.lelsCategoricosDeVerbo=  lelsCategoricosDeVerbo
 
     def nuevoLelDeMedida(self, unLelDeMedida):
