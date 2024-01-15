@@ -1,6 +1,8 @@
 from typing import List
+from models.Lel import Lel
 from models.clasesDiagrama.linkDiagrama import LinkDiagrama
 from models.clasesDiagrama.objetoDiagrama import ObjetoDiagrama
+from models.clasesDiagrama.tipoObjetoDiagrama import TipoObjetoDiagrama
 
 
 class Diagrama:
@@ -16,10 +18,8 @@ class Diagrama:
     def nuevoObjetoDelDiagrama(self, objetoDelDiagrama):
         self.objetosDelDiagrama.append(objetoDelDiagrama)
 
-    def generarLinks(self,desdeExpresion, lelsCategoricos):
+    def generarLinks(self,desdeExpresion, lelsCategoricos: List[Lel]):
         for lel in lelsCategoricos:
-            nuevoLink = LinkDiagrama(desdeExpresion, lel.expresion)
+            nuevoLink = LinkDiagrama(desdeExpresion, lel.simbolo)
             self.linksDelDiagrama.append(nuevoLink)
-        
-    def cargarLosNiveles(self, sujeto, lelsDeNivel ):
-        return ''    
+

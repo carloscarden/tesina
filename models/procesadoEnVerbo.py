@@ -30,5 +30,5 @@ class ProcesadoEnVerbo:
 
     def devolverLelsDeMedida(self):
         if(self.lelsDeMedida):
-            return self.lelsDeMedida[0].expresion
+            return self.lelsDeMedida[0].simbolo
         return ''

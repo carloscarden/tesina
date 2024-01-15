@@ -23,17 +23,7 @@ from typing import List
 nlp = spacy.load("en_core_web_sm")
 
 
-class Regla:
-
-    def recuperarLosVerbos(self, lels: List[Lel]):
-          return [objeto for objeto in lels if objeto.categoria == Categoria.VERBO]
-    
-    
-    def encontrarObjetosYsujetosDeVerbo(self, nocion: str):
-        notionVerboDoc = nlp(nocion)
-        # procesar notion para que me de los objetos y sujetos
-        lista_simboloes = self.procesarNotion(notionVerboDoc)
-        return lista_simboloes
+class Reglas:
 
 
     def procesarNotion(self, doc: Doc) -> List[str]:
@@ -46,28 +36,6 @@ class Regla:
                 objetos_y_sujetos.append(token.text)
         return objetos_y_sujetos
 
-    def procesarElVerbo(self, sujetosYObjetosDeVerbo: List[str], lelMockeado: List[Lel])-> ProcesadoEnVerbo:
-        procesadoEnVerbo = ProcesadoEnVerbo([],[])
-        for simbolo in sujetosYObjetosDeVerbo :
-            # Encontrar el LEL correspondiente
-            lelDeVerboAprocesar = list( filter( lambda obj_lel: self.esLelBuscado(obj_lel, simbolo) , 
-                                           lelMockeado))
-            if lelDeVerboAprocesar:
-                doc = nlp(lelDeVerboAprocesar[0].nocion)
-                medidas = [tok.text for tok in doc if self.es_medida(tok.text)]
-                if(len(medidas)>0):
-
-                        # REGLA 2
-
-                    # Numerical objects and subjects of verbs give origin to measures.
-                    # buscar entre los objetos y sujetos del notion un objeto numerico
-                    procesadoEnVerbo.nuevoLelDeMedida(lelDeVerboAprocesar[0])
-                else:
-                        # REGLA 3
-                    # Categorical objects and subjects of verbs give origin to dimensions
-                    # Si no cae en la categoria de medida, entonces es un categorico del verbo
-                    procesadoEnVerbo.nuevoLelCategoricoDeVerbo(lelDeVerboAprocesar[0])
-        return procesadoEnVerbo
 
     def es_medida(self, palabra):
         sinonimos = set()
@@ -91,121 +59,18 @@ class Regla:
         return any(medida in sinonimos for medida in medidas)
 
 
-
-    def encontrarLosObjetosCategoricosDeSujetos(self, lelsCategoricos: Lel):
-        doc = nlp(lelsCategoricos.nocion)
-
-        # Lista de palabras objetivo
-        target_words = ["has", "belongs", "comprised", "covered", "incorporated", "involves", 
-                    "according","according to", "characterized by","manufactured"]
-
-        encontradoEnSujeto = EncontradoEnSujeto([],[], [])
-
-
-        for token in doc:
-            esCompuesta = self.fraseCompuesta(token, doc, target_words)
-        
-            if token.text in target_words or esCompuesta:
-            # Encuentra el sujeto y el objeto de la relación
-                obj = [w for w in token.rights if w.dep_ == "dobj" or w.dep_ == "pobj"]
-
-                if(esCompuesta):
-                    obj = [w for w in doc[token.i + 1].rights  if w.dep_ == "dobj" or w.dep_ == "pobj"]
-                else:
-                    obj = [w for w in token.rights if w.dep_ == "dobj" or w.dep_ == "pobj"]
-
-
-
-                # Busca el objeto en la lista de sustantivos y adjetivos a la derecha
-                if not obj:
-                    if(esCompuesta):
-                        obj = [w for w in doc[token.i + 1].rights if w.dep_ == "amod" or w.dep_ == "nsubj"]
-                    else:
-                        obj = [w for w in token.rights if w.dep_ == "amod" or w.dep_ == "nsubj"]
-            
-                # Maneja las preposiciones
-                if not obj:
-                    if(esCompuesta):
-                        obj = [w for w in doc[token.i + 1].rights if w.dep_ == "prep"]
-                    else:
-                        obj = [w for w in token.rights if w.dep_ == "prep"]
-                    if obj:
-                        obj = [w for w in obj[0].rights if w.dep_ == "pobj"]
-                if obj:
-                    # Find noun chunks that contain the object
-                    noun_chunk = next((nc for nc in doc.noun_chunks if nc.root == obj[0] ), None)
-                    self.procesarNounChunk(encontradoEnSujeto, noun_chunk)
-        return encontradoEnSujeto
-
-
     def fraseCompuesta(self, token: Token, doc: Doc, target_words: List[str]) -> bool:
         if token.i < len(doc) - 1:
             target_phrase = token.text + " " + doc[token.i + 1].text
             return target_phrase in target_words
         return False
 
-    def procesarNounChunk(self, encontradoEnSujeto: EncontradoEnSujeto, noun_chunk: Span ):
-        # Crear lista de palabras a eliminar
-        stop_words = ["its", "an", "a"]
-
-        for nc in noun_chunk:
-            if(nc.tag_ in ["NNS", "NNPS"]):
-                encontradoEnSujeto.nuevoPlural(nc)
-                return
-        sinPreposiciones = [t for t in noun_chunk if t.text.lower() not in stop_words]
-        if(len(sinPreposiciones) > 1):
-            encontradoEnSujeto.nuevoNounChunk(sinPreposiciones)
-        else:
-            encontradoEnSujeto.nuevoObjetoSimple(sinPreposiciones[0])
-
-
-    def procesarElSujeto(self, encontradoEnSujeto: EncontradoEnSujeto, lelMockeado) -> ProcesadoEnSujeto:
-
-        procesadoEnSujeto = ProcesadoEnSujeto([],[])
-        self.procesarLosObjectsSimples(procesadoEnSujeto, encontradoEnSujeto.objectsSimple, lelMockeado)
-        self.procesarLosPalabraDoble(procesadoEnSujeto, encontradoEnSujeto.nounChunks, lelMockeado)
-
-        return procesadoEnSujeto
-
-
-
-    def procesarLosObjectsSimples(self, procesadoEnSujeto: ProcesadoEnSujeto, 
-                                   objectsSimple, lelMockeado):
-        
-        for simbolo in objectsSimple:
-            aBuscar = simbolo.text.lower()
-
-            lelDeSujetoAprocesar = list( filter( lambda lel: self.esLelBuscado(lel, aBuscar) , 
-                                           lelMockeado))
-            self.tipoDeLelQueEsElSujeto(lelDeSujetoAprocesar, procesadoEnSujeto)                               
-
     
     def esLelBuscado(self, unLel: Lel, simboloAbuscar: str):
+        ''' Dado un string se fija si el simbolo del lel coincide y es distinto de un verbo'''
         return  unLel.simbolo.lower()==  simboloAbuscar and unLel.categoria != Categoria.VERBO
 
-
-    def tipoDeLelQueEsElSujeto(self, lelDeSujetoAprocesar:List[Lel], procesadoEnSujeto: ProcesadoEnSujeto):
-        if lelDeSujetoAprocesar :
-            doc = nlp(lelDeSujetoAprocesar[0].nocion)
-            medidas = [tok.text for tok in doc if self.es_medida(tok.text)]
-            if(len(medidas)>0):
-                     #Rule 5. 
-                # Numerical objects and subjects of objects or subjects give origin to properties.
-                # buscar entre los objetos y sujetos del notion un objeto numerico
-                procesadoEnSujeto.nuevoLelDePropiedad(lelDeSujetoAprocesar[0])
-            else:
-                    # REGLA 4
-                # Categorical objects and subjects of objects or subjects give origin to levels
-                # Si no cae en la categoria de medida, entonces es un categorico del verbo
-                procesadoEnSujeto.nuevoLelDeNivel(lelDeSujetoAprocesar[0])
-
     
-    def procesarLosPalabraDoble(self, procesadoEnSujeto, nounChunks, lelMockeado):
-        for nc in nounChunks:
-            lelDeSujetoAprocesar = list( filter( lambda lel: self.esLelBuscadoCompuesto(lel, nc) , 
-                                           lelMockeado))
-            self.tipoDeLelQueEsElSujeto(lelDeSujetoAprocesar, procesadoEnSujeto)                               
-
 
     def esLelBuscadoCompuesto(self, unLel: Lel, simboloAbuscar):
         completo = " ".join([ n.text for n in simboloAbuscar]).strip()
@@ -213,3 +78,4 @@ class Regla:
         return ( unLel.simbolo.lower().strip() ==  completo.lower() and unLel.categoria != Categoria.VERBO ) or \
                ( unLel.simbolo.lower().strip() ==  ultimo.lower() and unLel.categoria != Categoria.VERBO )
     
+

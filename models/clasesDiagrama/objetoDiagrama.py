@@ -1,9 +1,43 @@
 
+from models.clasesDiagrama.tipoObjetoDiagrama import TipoObjetoDiagrama
+
+
 class ObjetoDiagrama:
     """Del diagrama representa toda la informacion para saber qué dibujar"""
     i = 12345
 
-    def __init__(self,key, prop1, category):
-        self.key = key
-        self.prop1= prop1
-        self.category= category
+    def __init__(self, simbolo, aQuienPertenece, categoria):
+        self.key = simbolo
+        self.prop1= aQuienPertenece
+        self.category= categoria
+    
+    @classmethod
+    def nuevoHecho(self, simbolo):
+        return ObjetoDiagrama(simbolo, '',  TipoObjetoDiagrama.HECHO)
+    
+    @classmethod
+    def nuevaMedida(self, simbolo, aQuienPertenece):
+        return ObjetoDiagrama(simbolo, aQuienPertenece, TipoObjetoDiagrama.MEDIDA)
+
+    @classmethod
+    def nuevaDimension(self, simbolo, aQuienPertenece):
+        return ObjetoDiagrama(simbolo, aQuienPertenece,  TipoObjetoDiagrama.DIMENSION)
+
+
+    @classmethod
+    def nuevoNivel(self, simbolo, aQuienPertenece):
+        return ObjetoDiagrama(simbolo, aQuienPertenece,  TipoObjetoDiagrama.NIVEL)
+
+
+    @classmethod
+    def nuevaPropiedad(self, simbolo, aQuienPertenece):
+        return ObjetoDiagrama(simbolo, aQuienPertenece,  TipoObjetoDiagrama.PROPIEDAD)
+
+    @classmethod
+    def nuevoArcoMultiple(self, simbolo, aQuienPertenece):
+        return ObjetoDiagrama(simbolo, aQuienPertenece,  TipoObjetoDiagrama.ARCO_MULTIPLE)
+
+
+    @classmethod
+    def nuevoArcoOpcional(self, simbolo, aQuienPertenece):
+        return ObjetoDiagrama(simbolo, aQuienPertenece,  TipoObjetoDiagrama.ARCO_OPCIONAL)

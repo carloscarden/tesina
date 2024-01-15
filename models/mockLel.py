@@ -11,7 +11,7 @@ of a patient in some seriousness in order to obtain some outcome.''')
         lel2 = Lel(Categoria.OBJETO, 'Dose', ''' Amount of a drug that is taken once, or
 regularly over a period of time''')
         lel3 = Lel(Categoria.SUJETO, 'Patient', ''' Person who is ill or hurt, characterized by
-gender and city.''')
+gender and city.''' )
         lel4 = Lel(Categoria.OBJETO, 'Drug', ''' Medicine or other substance which has a
 physiological effect when ingested or otherwise introduced into the body according to
 its administration mode. The drug is also

@@ -1,12 +1,13 @@
 import spacy
-from reglas import Regla
+
+from Reglas import Reglas
 
 # Cargar modelo de lenguaje en inglés de Spacy
 nlp = spacy.load("en_core_web_md")
 
 doc = nlp("date: A particular day of a month, in a particular year.")
 
-reglas = Regla()
+reglas = Reglas()
 sujetosYObjetosDeVerbo = reglas.encontrarObjetosYsujetosDeVerbo("date: A particular day of a month, in a particular year.")
 print(sujetosYObjetosDeVerbo)
 date_token = doc[0] # el primer token de la oración

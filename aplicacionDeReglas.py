@@ -1,17 +1,22 @@
+from Reglas import Reglas
+from models.clasesDiagrama.DiagramasEnVerbo import DiagramasEnVerbo
+from models.clasesDiagrama.DiagramasEnSujeto import DiagramasEnSujeto
 from models.clasesDiagrama.diagrama import Diagrama
 from models.clasesDiagrama.objetoDiagrama import ObjetoDiagrama
 from models.clasesDiagrama.tipoObjetoDiagrama import TipoObjetoDiagrama
 from models.mockLel import MockLel
 import spacy
-from reglas import Regla
 
 
 nlp = spacy.load("en_core_web_sm")
-reglas = Regla()
+reglas = Reglas()
 m = MockLel()
 lelMockeado = m.lelMockeado()
 
 diagrama = Diagrama([], [])
+
+diagramasEnVerbo = DiagramasEnVerbo(diagrama)
+diagramasEnSujeto = DiagramasEnSujeto(diagrama)
 
         # REGLA 1
 # Verbs give origin to facts. 
@@ -19,9 +24,9 @@ verbos = reglas.recuperarLosVerbos(lelMockeado)
 
 for v in verbos:
 
-    verboEnDiagrama = ObjetoDiagrama(v.simbolo, '',  TipoObjetoDiagrama.HECHO)
 
-
+    # v should be defined as a fact
+    diagramasEnVerbo.nuevoHecho(v)
 
     # Encontrar todos los Categorical objects and subjects del verbo
     sujetosYObjetosDeVerbo = reglas.encontrarObjetosYsujetosDeVerbo(v.nocion)
@@ -32,25 +37,14 @@ for v in verbos:
     procesadoEnVerbo = reglas.procesarElVerbo(sujetosYObjetosDeVerbo, lelMockeado)
 
 
-    # all the elements in lelsDeMedida should be defined as measures of the
-    # fact corresponding to v
-    verboEnDiagrama.prop1 = procesadoEnVerbo.devolverLelsDeMedida()
-    
-    diagrama.nuevoObjetoDelDiagrama(verboEnDiagrama)
+    diagramasEnVerbo.generarObjetosDelDiagramaPorVerbo(procesadoEnVerbo, v.simbolo)
 
+    v.terminadoDeProcesarVerbo()
 
-    # all the elements in lelsDeMedida should be defined as measures of the
-    # fact corresponding to v
-    diagrama.generarLinks(v.simbolo, procesadoEnVerbo.lelsCategoricosDeVerbo)                         
 
 lelsAprocesar = procesadoEnVerbo.lelsCategoricosDeVerbo
 
 
-# True/False are not keywords, they are just built in global constants 
-# (that are reassignable like any other variable), 
-# so the interpreter has to check what they point to
-
-# 0 and 1 are faster than False and True
 while 1:
     hayMasLels = []
 

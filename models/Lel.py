@@ -4,6 +4,10 @@
 en el cual se definen símbolos (términos o frases), y cada símbolo se define a través
 de dos atributos: la noción y los impactos"""
 
+from models.DatosParaProcesoDiagrama import DatosParaProcesoDiagrama
+from models.clasesDiagrama.tipoObjetoDiagrama import TipoObjetoDiagrama
+
+
 class Lel:
 
     i = 12345
@@ -21,3 +25,14 @@ class Lel:
         y sustanciales del símbolo
         '''
         self.nocion = nocion
+
+        '''
+        Datos necesarios para la construccion del diagrama
+        '''
+        self.datosParaProceso = DatosParaProcesoDiagrama(False, None, None)
+
+
+    def terminadoDeProcesarVerbo(self):
+        self.datosParaProceso.procesadoLel = True
+        self.datosParaProceso.tipoObjetoDiagrama = TipoObjetoDiagrama.HECHO
+
