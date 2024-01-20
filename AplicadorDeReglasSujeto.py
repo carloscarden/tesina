@@ -6,7 +6,7 @@ from models.clasesDiagrama.DiagramasEnSujeto import DiagramasEnSujeto
 from models.clasesDiagrama.diagrama import Diagrama
 
 
-class AplicadorDeReglasVerbo():
+class AplicadorDeReglasSujeto():
 
     def __init__(self, unDiagrama: Diagrama) -> None:
         self.diagramasEnSujeto = DiagramasEnSujeto(unDiagrama)
@@ -14,6 +14,7 @@ class AplicadorDeReglasVerbo():
 
 
     def aplicarReglasDeSujeto(self, lelsCategoricosDeVerbo: List[Lel], lels: List[Lel]):
+
         lelsAprocesar = lelsCategoricosDeVerbo
 
         while 1:
@@ -42,8 +43,6 @@ class AplicadorDeReglasVerbo():
                 break
             else:
                 lelsAprocesar = hayMasLels
-
-
 
 
 

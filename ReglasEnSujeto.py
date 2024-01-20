@@ -131,5 +131,3 @@ class ReglasEnSujeto(Reglas):
                 procesadoEnSujeto.nuevoLelDeNivel(lelDeSujetoAprocesar[0])
 
     
-
-    

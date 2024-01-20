@@ -11,9 +11,6 @@ from nltk.corpus import wordnet
 
 
 from models.Lel import Lel
-from models.encontradoEnSujeto import EncontradoEnSujeto
-from models.procesadoEnSujeto import ProcesadoEnSujeto
-from models.procesadoEnVerbo import ProcesadoEnVerbo
 from models.Categoria import Categoria
 
 from typing import List

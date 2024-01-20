@@ -27,7 +27,7 @@ nlp = spacy.load("en_core_web_sm")
 
 class ReglasEnVerbo(Reglas):
 
-    def recuperarLosVerbos(self, lels: List[Lel]):
+    def recuperarLosVerbos(self, lels: List[Lel]) -> List[Lel]:
           return [objeto for objeto in lels if objeto.categoria == Categoria.VERBO]
     
     

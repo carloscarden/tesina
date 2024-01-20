@@ -1,29 +1,27 @@
 import spacy
+from ReglasEnVerbo import ReglasEnVerbo
 
-from Reglas import Reglas
-
-# Cargar modelo de lenguaje en inglés de Spacy
-nlp = spacy.load("en_core_web_md")
-
-doc = nlp("date: A particular day of a month, in a particular year.")
-
-reglas = Reglas()
-sujetosYObjetosDeVerbo = reglas.encontrarObjetosYsujetosDeVerbo("date: A particular day of a month, in a particular year.")
-print(sujetosYObjetosDeVerbo)
-date_token = doc[0] # el primer token de la oración
-print("****************")
-print(date_token)
-candidates = [token for token in doc if token != date_token]
-
-similarities = [(candidate.text, date_token.similarity(candidate)) for candidate in candidates]
-
-similarities_sorted = sorted(similarities, key=lambda x: x[1], reverse=True)
-
-for candidate, score in similarities_sorted:
-    print(candidate, score)
+from models.mockLel import MockLel
 
 
+m = MockLel()
+lelMockeado = m.lelMockeado()
 
+reglasVerbo = ReglasEnVerbo()
+
+# REGLA1
+# Verbs give origin to facts. 
+verbo = reglasVerbo.recuperarLosVerbos(lelMockeado)
+
+#  devuelve :  lel Administer
+
+# Encontrar todos los Categorical objects and subjects del verbo
+sujetosYObjetosDeVerbo = reglasVerbo.encontrarObjetosYsujetosDeVerbo(verbo[0].nocion)
+
+
+# apply Rule 2 to v, get set Mf of measures, add them to f
+# apply Rule 3 to v, get set Df of dimensions, add them to f
+procesadoEnVerbo = reglasVerbo.procesarElVerbo(sujetosYObjetosDeVerbo, lelMockeado)
 
 
 
