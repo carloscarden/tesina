@@ -21,7 +21,6 @@ class DiagramasEnVerbo:
 
     def generarObjetosDelDiagramaPorVerbo(self, procesadoEnVerbo: ProcesadoEnVerbo, simbolo: str):
         
-    
         # all the elements in lelsDeMedida should be defined as 
         # measures of the fact corresponding to v
         self.nuevasMedidasDeVerbo(procesadoEnVerbo.lelsDeMedida, simbolo)
@@ -39,4 +38,6 @@ class DiagramasEnVerbo:
 
 
     def nuevasDimensionesDeVerbo(self, lelsDeDimensiones: List[Lel], verboLel: List[Lel]):
-        pass
+        for lel in lelsDeDimensiones:
+            nuevaMedida = ObjetoDiagrama.nuevaDimension(lel.simbolo, verboLel)
+            self.diagrama.nuevoObjetoDelDiagrama(nuevaMedida)

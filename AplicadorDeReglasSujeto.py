@@ -4,6 +4,7 @@ from models.Lel import Lel
 
 from models.clasesDiagrama.DiagramasEnSujeto import DiagramasEnSujeto
 from models.clasesDiagrama.diagrama import Diagrama
+from models.clasesDiagrama.linkDiagrama import LinkDiagrama
 
 
 class AplicadorDeReglasSujeto():
@@ -32,12 +33,22 @@ class AplicadorDeReglasSujeto():
                 niveles = procesadoEnSujeto.lelsDeNivel
 
                 for nivel in niveles:
-                    # apply Rule 6 to o and o′, possibly change the arc from l to l′to multiple
-                    # apply Rule 7 to o and o′, possibly change the arc from l to l′to optional
+                    link = None
+                    if(self.reglas.esArcoMultiple(encontradoEnSujeto.pluralChunks, nivel.simbolo)):
+                        # apply Rule 6 to o and o′, possibly change the arc from l to l′to multiple
+                        link = LinkDiagrama.nuevoLinkMultiple( sujeto.simbolo, nivel.simbolo)
+                    elif (self.reglas.esArcoOpcional(sujeto.datosParaProceso.docNotion, nivel.simbolo)):
+                        # apply Rule 7 to o and o′, possibly change the arc from l to l′to optional
+                        link= LinkDiagrama.nuevoLinkOpcional( sujeto.simbolo, nivel.simbolo)
+                    else:
+                        link= LinkDiagrama.nuevoHecho( sujeto.simbolo, nivel.simbolo)
+                    self.diagramasEnSujeto.nuevoLinkDelDiagrama(link)
+
                     pass
 
-                hayMasLels.extend(procesadoEnSujeto.lelsDeNivel)
-
+                hayMasLels.extend(procesadoEnSujeto.lelsDeNivelNoProcesados)
+                self.diagramasEnSujeto.nuevasPropiedades(procesadoEnSujeto.lelsDePropiedad)
+                self.diagramasEnSujeto.nuevosNiveles(procesadoEnSujeto.lelsDeNivelNoProcesados)
 
             if not hayMasLels:
                 break

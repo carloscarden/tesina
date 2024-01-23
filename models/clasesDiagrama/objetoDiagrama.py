@@ -32,12 +32,3 @@ class ObjetoDiagrama:
     @classmethod
     def nuevaPropiedad(self, simbolo, aQuienPertenece):
         return ObjetoDiagrama(simbolo, aQuienPertenece,  TipoObjetoDiagrama.PROPIEDAD)
-
-    @classmethod
-    def nuevoArcoMultiple(self, simbolo, aQuienPertenece):
-        return ObjetoDiagrama(simbolo, aQuienPertenece,  TipoObjetoDiagrama.ARCO_MULTIPLE)
-
-
-    @classmethod
-    def nuevoArcoOpcional(self, simbolo, aQuienPertenece):
-        return ObjetoDiagrama(simbolo, aQuienPertenece,  TipoObjetoDiagrama.ARCO_OPCIONAL)

@@ -18,7 +18,7 @@ class Primeras3ReglasTest(unittest.TestCase):
 
         '''  Numerical objects and subjects of verbs give origin to measures. 
         
-           entrada: notion verb, List[Lel]
+           entrada: notion verb, List[Lel] 
            salida:  List[Lel] tq Lel sea el numerical object del verbo
         
         '''

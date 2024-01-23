@@ -36,3 +36,15 @@ class Lel:
         self.datosParaProceso.procesadoLel = True
         self.datosParaProceso.tipoObjetoDiagrama = TipoObjetoDiagrama.HECHO
 
+
+    def terminadoDeProcesarNivel(self):
+        self.datosParaProceso.procesadoLel = True
+        self.datosParaProceso.tipoObjetoDiagrama = TipoObjetoDiagrama.NIVEL
+
+    def terminadoDeProcesarPropiedad(self):
+        self.datosParaProceso.procesadoLel = True
+        self.datosParaProceso.tipoObjetoDiagrama = TipoObjetoDiagrama.PROPIEDAD
+
+    def estaProcesado(self):
+        return self.datosParaProceso.procesadoLel
+

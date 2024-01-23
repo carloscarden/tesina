@@ -12,6 +12,7 @@ from Reglas import Reglas
 
 
 from models.Lel import Lel
+from models.clasesDiagrama.linkDiagrama import LinkDiagrama
 from models.encontradoEnSujeto import EncontradoEnSujeto
 from models.procesadoEnSujeto import ProcesadoEnSujeto
 
@@ -39,7 +40,7 @@ class ReglasEnSujeto(Reglas):
             esCompuesta = self.fraseCompuesta(token, doc, target_words)
         
             if token.text in target_words or esCompuesta:
-            # Encuentra el sujeto y el objeto de la relación
+                # Encuentra el sujeto y el objeto de la relación
                 obj = [w for w in token.rights if w.dep_ == "dobj" or w.dep_ == "pobj"]
 
                 if(esCompuesta):
@@ -82,6 +83,7 @@ class ReglasEnSujeto(Reglas):
                 return
         sinPreposiciones = [t for t in noun_chunk if t.text.lower() not in stop_words]
         if(len(sinPreposiciones) > 1):
+            # palabras dobles
             encontradoEnSujeto.nuevoNounChunk(sinPreposiciones)
         else:
             encontradoEnSujeto.nuevoObjetoSimple(sinPreposiciones[0])
@@ -124,10 +126,35 @@ class ReglasEnSujeto(Reglas):
                 # Numerical objects and subjects of objects or subjects give origin to properties.
                 # buscar entre los objetos y sujetos del notion un objeto numerico
                 procesadoEnSujeto.nuevoLelDePropiedad(lelDeSujetoAprocesar[0])
+                lelDeSujetoAprocesar[0].terminadoDeProcesarPropiedad()
             else:
                     # REGLA 4
                 # Categorical objects and subjects of objects or subjects give origin to levels
                 # Si no cae en la categoria de medida, entonces es un categorico del verbo
                 procesadoEnSujeto.nuevoLelDeNivel(lelDeSujetoAprocesar[0])
+                if(not lelDeSujetoAprocesar[0].estaProcesado):
+                    procesadoEnSujeto.nuevoLelDeNivelNoProcesado(lelDeSujetoAprocesar[0])
+                    lelDeSujetoAprocesar[0].terminadoDeProcesarNivel()
+
+    
+
+    def esArcoMultiple(self, docNotionLevel, level):
+        ''' . If o′is plural, then the arc from o to o′is a multiple one.'''
+        pass
+
+    def esArcoOpcional(self, docNotionLevel, level):
+
+        '''
+        If the docNotion  used in n to relate o with o′ suggests that some instances
+of o may not be associated to every instance of o′, then the arc from o to o′ is an optional one.
+        '''    
+           #         Rule 7 deals with expressions of possibility. Although simple analysis
+            #could be made using a glossary of modal auxiliaries (e.g., may, might, could,
+            #would, should), a more complete analysis would require some epistemic
+            #expressions
+        pass
+
+
+
 
     
