@@ -34,7 +34,7 @@ class AplicadorDeReglasSujeto():
 
                 for nivel in niveles:
                     link = None
-                    if(self.reglas.esArcoMultiple(encontradoEnSujeto.pluralChunks, nivel.simbolo)):
+                    if(self.reglas.esArcoMultiple(encontradoEnSujeto, nivel.simbolo)):
                         # apply Rule 6 to o and o′, possibly change the arc from l to l′to multiple
                         link = LinkDiagrama.nuevoLinkMultiple( sujeto.simbolo, nivel.simbolo)
                     elif (self.reglas.esArcoOpcional(sujeto.datosParaProceso.docNotion, nivel.simbolo)):

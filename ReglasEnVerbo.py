@@ -31,8 +31,8 @@ class ReglasEnVerbo(Reglas):
           return [objeto for objeto in lels if objeto.categoria == Categoria.VERBO]
     
     
-    def encontrarObjetosYsujetosDeVerbo(self, nocion: str):
-        notionVerboDoc = nlp(nocion)
+    def encontrarObjetosYsujetosDeVerbo(self, verbo: Lel):
+        notionVerboDoc = verbo.devolverDocNotion(nlp)
         # procesar notion para que me de los objetos y sujetos
         lista_simboloes = self.procesarNotion(notionVerboDoc)
         return lista_simboloes
@@ -46,7 +46,7 @@ class ReglasEnVerbo(Reglas):
             lelDeVerboAprocesar = list( filter( lambda obj_lel: self.esLelBuscado(obj_lel, simbolo) , 
                                            lelMockeado))
             if lelDeVerboAprocesar:
-                doc = nlp(lelDeVerboAprocesar[0].nocion)
+                doc = lelDeVerboAprocesar[0].devolverDocNotion(nlp)
                 medidas = [tok.text for tok in doc if self.es_medida(tok.text)]
                 if(len(medidas)>0):
 

@@ -9,6 +9,7 @@ class DatosParaProcesoDiagrama:
 
     i = 12345
 
+
     def __init__(self, procesado: bool, docNotion: Doc, unTipoObjetoDiagrama: str):
         # si el lel se proceso o no
         self.procesadoLel = procesado
@@ -16,3 +17,12 @@ class DatosParaProcesoDiagrama:
         self.docNotion = docNotion
 
         self.tipoObjetoDiagrama =  unTipoObjetoDiagrama
+
+
+
+    def getDocNotion(self, nocion, nlp):
+        if(self.docNotion):
+            return self.docNotion
+        
+        self.docNotion = nlp(nocion)
+        return self.docNotion

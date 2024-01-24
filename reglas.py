@@ -68,7 +68,6 @@ class Reglas:
         return  unLel.simbolo.lower()==  simboloAbuscar and unLel.categoria != Categoria.VERBO
 
     
-
     def esLelBuscadoCompuesto(self, unLel: Lel, simboloAbuscar):
         completo = " ".join([ n.text for n in simboloAbuscar]).strip()
         ultimo  = simboloAbuscar[-1].text.strip()

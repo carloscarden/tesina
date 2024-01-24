@@ -48,3 +48,5 @@ class Lel:
     def estaProcesado(self):
         return self.datosParaProceso.procesadoLel
 
+    def devolverDocNotion(self, nlp):
+        return self.datosParaProceso.getDocNotion(self.nocion, nlp)

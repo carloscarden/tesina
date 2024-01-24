@@ -12,7 +12,6 @@ from Reglas import Reglas
 
 
 from models.Lel import Lel
-from models.clasesDiagrama.linkDiagrama import LinkDiagrama
 from models.encontradoEnSujeto import EncontradoEnSujeto
 from models.procesadoEnSujeto import ProcesadoEnSujeto
 
@@ -27,7 +26,7 @@ class ReglasEnSujeto(Reglas):
 
 
     def encontrarLosObjetosCategoricosDeSujetos(self, lelsCategoricos: Lel):
-        doc = nlp(lelsCategoricos.nocion)
+        doc = lelsCategoricos.devolverDocNotion(nlp)
 
         # Lista de palabras objetivo
         target_words = ["has", "belongs", "comprised", "covered", "incorporated", "involves", 
@@ -68,25 +67,8 @@ class ReglasEnSujeto(Reglas):
                 if obj:
                     # Find noun chunks that contain the object
                     noun_chunk = next((nc for nc in doc.noun_chunks if nc.root == obj[0] ), None)
-                    self.procesarNounChunk(encontradoEnSujeto, noun_chunk)
+                    encontradoEnSujeto.nuevoObjeto(noun_chunk)
         return encontradoEnSujeto
-
-
-
-    def procesarNounChunk(self, encontradoEnSujeto: EncontradoEnSujeto, noun_chunk: Span ):
-        # Crear lista de palabras a eliminar
-        stop_words = ["its", "an", "a"]
-
-        for nc in noun_chunk:
-            if(nc.tag_ in ["NNS", "NNPS"]):
-                encontradoEnSujeto.nuevoPlural(nc)
-                return
-        sinPreposiciones = [t for t in noun_chunk if t.text.lower() not in stop_words]
-        if(len(sinPreposiciones) > 1):
-            # palabras dobles
-            encontradoEnSujeto.nuevoNounChunk(sinPreposiciones)
-        else:
-            encontradoEnSujeto.nuevoObjetoSimple(sinPreposiciones[0])
 
 
     def procesarElSujeto(self, encontradoEnSujeto: EncontradoEnSujeto, lelMockeado) -> ProcesadoEnSujeto:
@@ -109,7 +91,6 @@ class ReglasEnSujeto(Reglas):
             self.tipoDeLelQueEsElSujeto(lelDeSujetoAprocesar, procesadoEnSujeto)                               
 
 
-
     def procesarLosPalabraDoble(self, procesadoEnSujeto, nounChunks, lelMockeado):
         for nc in nounChunks:
             lelDeSujetoAprocesar = list( filter( lambda lel: self.esLelBuscadoCompuesto(lel, nc) , 
@@ -119,7 +100,7 @@ class ReglasEnSujeto(Reglas):
 
     def tipoDeLelQueEsElSujeto(self, lelDeSujetoAprocesar:List[Lel], procesadoEnSujeto: ProcesadoEnSujeto):
         if lelDeSujetoAprocesar :
-            doc = nlp(lelDeSujetoAprocesar[0].nocion)
+            doc = lelDeSujetoAprocesar[0].devolverDocNotion(nlp)
             medidas = [tok.text for tok in doc if self.es_medida(tok.text)]
             if(len(medidas)>0):
                      #Rule 5. 
@@ -138,12 +119,17 @@ class ReglasEnSujeto(Reglas):
 
     
 
-    def esArcoMultiple(self, docNotionLevel, level):
+    def esArcoMultiple(self, encontradoEnSujeto: EncontradoEnSujeto, level):
         ''' . If o′is plural, then the arc from o to o′is a multiple one.'''
-        pass
+        for simbolo in encontradoEnSujeto.pluralChunks:
+            aBuscar = simbolo.text.lower()
+            if(self.esLelBuscado(level, aBuscar)):
+                return True
+            if(self.esLelBuscadoCompuesto(level, aBuscar)):
+                return True
+        return False
 
     def esArcoOpcional(self, docNotionLevel, level):
-
         '''
         If the docNotion  used in n to relate o with o′ suggests that some instances
 of o may not be associated to every instance of o′, then the arc from o to o′ is an optional one.
